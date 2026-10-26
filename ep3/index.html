@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFF4DC">
+<link rel="icon" href="data:,">
+<title>Milo's First Day at Forest School</title>
+<style>
+  :root {
+    --cream: #FFF4DC;
+    --paper: #FFFBF2;
+    --honey: #B9793F;
+    --tomato: #E0603A;
+    --tomato-dark: #A9402A;
+    --mustard: #F2B440;
+    --leaf: #4F7A3A;
+    --brown: #5A3420;
+    --shadow: 0 12px 32px rgba(90, 52, 32, .18);
+    font-family: "Nunito", ui-rounded, "SF Pro Rounded", "Varela Round", "Arial Rounded MT Bold", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    color: var(--brown);
+    background: radial-gradient(circle at top, #FFE7B8, var(--cream) 60%);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ---------- top toggles ---------- */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 960px;
+  }
+
+  .toggle {
+    flex: 1 1 260px;
+    min-height: 72px;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font: inherit;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--brown);
+    background: var(--paper);
+    border: 3px solid var(--brown);
+    border-radius: 999px;
+    box-shadow: 0 6px 0 var(--brown);
+    cursor: pointer;
+    transition: transform .08s ease, box-shadow .08s ease, background .2s ease, color .2s ease;
+  }
+  .toggle[aria-pressed="true"] {
+    color: #fff;
+    background: var(--leaf);
+    box-shadow: 0 3px 0 #2E4A22;
+    transform: translateY(3px);
+  }
+  .toggle:active { transform: translateY(6px); box-shadow: 0 0 0 var(--brown); }
+  .toggle:disabled { opacity: .5; cursor: not-allowed; }
+  .toggle .icon { font-size: 1.6rem; line-height: 1; }
+
+  /* ---------- book ---------- */
+  .book {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    background: var(--paper);
+    border: 4px solid var(--brown);
+    border-radius: 36px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .stage {
+    padding: 22px 22px 124px;
+    touch-action: pan-y;   /* let the browser handle vertical scroll, we handle horizontal swipes */
+  }
+
+  .page { display: none; flex-direction: column; gap: 22px; }
+  .page.active { display: flex; }
+
+  .art {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 24px;
+    overflow: hidden;
+    background: #FFE9C7;
+  }
+  .art img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .art .placeholder {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: radial-gradient(circle at 30% 30%, #FFF6DA, #FFE0B8 55%, #F9CDB5);
+    color: var(--brown);
+    text-align: center;
+    padding: 12px;
+  }
+  .placeholder .bear { font-size: 4.5rem; line-height: 1; }
+  .placeholder p { margin: 0; font-size: 1.1rem; font-weight: 700; opacity: .8; }
+  .art.missing img { display: none; }
+  .art.missing .placeholder { display: flex; }
+
+  .text {
+    margin: 0;
+    text-align: center;
+    font-size: clamp(1.9rem, 4.6vw, 2.9rem);
+    font-weight: 800;
+    line-height: 1.35;
+    letter-spacing: .01em;
+  }
+
+  /* wide screens: picture left, words right */
+  @media (min-width: 820px) {
+    .stage { padding: 30px 30px 130px; }
+    .page.active {
+      display: grid;
+      grid-template-columns: minmax(0,1.5fr) minmax(0,1fr);
+      gap: 36px;
+      align-items: center;
+    }
+    .art { aspect-ratio: 4 / 3; }
+  }
+
+  /* ---------- corner arrows ---------- */
+  .arrow {
+    position: absolute;
+    bottom: 18px;
+    width: 92px;
+    height: 92px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--tomato);
+    color: #fff;
+    box-shadow: 0 7px 0 var(--tomato-dark);
+    cursor: pointer;
+    transition: transform .08s ease, box-shadow .08s ease, opacity .2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .arrow.left { left: 18px; }
+  .arrow.right { right: 18px; }
+  .arrow svg { width: 46px; height: 46px; fill: none; stroke: currentColor; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+  .arrow:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 2px 0 var(--tomato-dark); }
+  .arrow:disabled { opacity: .3; cursor: default; }
+
+  .toggle:focus-visible,
+  .arrow:focus-visible,
+  .back:focus-visible {
+    outline: 5px solid var(--mustard);
+    outline-offset: 3px;
+  }
+
+  .counter {
+    position: absolute;
+    left: 50%;
+    bottom: 42px;
+    transform: translateX(-50%);
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--brown);
+    background: var(--cream);
+    border-radius: 999px;
+    padding: 4px 16px;
+    white-space: nowrap;
+  }
+
+  /* ---------- page flip animation ---------- */
+  .page.enter-next { animation: inRight .45s ease-out; }
+  .page.enter-prev { animation: inLeft .45s ease-out; }
+  @keyframes inRight {
+    from { opacity: 0; transform: translateX(44px) rotate(.6deg); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes inLeft {
+    from { opacity: 0; transform: translateX(-44px) rotate(-.6deg); }
+    to   { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .page.enter-next, .page.enter-prev { animation: none; }
+  }
+  .words { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
+  .title { margin:0; text-align:center; font-size:clamp(2rem,4.2vw,3rem); font-weight:900; line-height:1.15; color:var(--tomato-dark); text-shadow:3px 3px 0 var(--mustard); }
+  .byline { margin:0; font-size:1.3rem; font-weight:700; opacity:.8; text-align:center; }
+  .back { margin-top:8px; font-size:1.1rem; font-weight:800; color:var(--tomato-dark); text-decoration:underline; text-underline-offset:4px; padding:6px 4px; border-radius:6px; }
+  .page.end .art img { filter: saturate(.9) brightness(1.03); }
+  .stage { touch-action: pan-y; }
+  @media (max-width: 819px) { .arrow { width:76px; height:76px; } .counter { bottom:36px; } }
+</style>
+</head>
+<body>
+
+  <nav class="toolbar" aria-label="Reading options">
+    <button id="music" class="toggle" type="button" aria-pressed="false">
+      <span class="icon" aria-hidden="true">🎵</span>
+      <span>Music <span class="state">Off</span></span>
+    </button>
+    <button id="voice" class="toggle" type="button" aria-pressed="false">
+      <span class="icon" aria-hidden="true">🔊</span>
+      <span>Read to me <span class="state">Off</span></span>
+    </button>
+  </nav>
+
+  <main class="book" id="book">
+    <div class="stage" id="stage"></div>
+
+    <button id="prev" class="arrow left" type="button" aria-label="Previous page">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><polyline points="30,8 14,24 30,40"/></svg>
+    </button>
+    <button id="next" class="arrow right" type="button" aria-label="Next page">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><polyline points="18,8 34,24 18,40"/></svg>
+    </button>
+
+    <div class="counter" id="counter" aria-live="polite"></div>
+  </main>
+
+<script>
+(() => {
+  'use strict';
+  const CALM = 'music_calm.mp3', PLAY = 'music_play.mp3', LULL = 'music_lull.mp3';
+  // Background music section for each page: calm (cover, p1-p4), play (p5-p14), lull (p15, end)
+  function trackFor(id) {
+    if (id === 'cover') return CALM;
+    if (id === 'end') return LULL;
+    const n = parseInt(id.slice(1), 10);
+    return n <= 4 ? CALM : n <= 14 ? PLAY : LULL;
+  }
+
+  const T = [
+    ['cover','cover.jpg','Milo in a mustard beanie waving, with Penny, Hazel, Acorn, Fern and Miss Owl at a wooden forest gate',`Milo's First Day at Forest School`],
+    ['p1','p1.jpg','Milo sitting up in a cosy bed beside a round window, with a small backpack waiting by the door','Today is Milo\'s first day at forest school!'],
+    ['p2','p2.jpg','Papa Bear straightening Milo\'s beanie while Mama Bear holds out a lunch basket in a warm kitchen','Papa Bear tucks his beanie on straight. "Off we go!"'],
+    ['p3','p3.jpg','Milo holding Mama Bear\'s paw and walking with Papa Bear on a forest path covered in autumn leaves','Crunch, crunch! Leaves crackle under their feet.'],
+    ['p4','p4.jpg','Milo peeking out from behind Mama Bear\'s apron at a tall wooden forest gate','Milo peeks behind Mama\'s apron. The gate is so big!'],
+    ['p5','p5.jpg','Miss Owl with her soft wings open in a welcome, smiling down at Milo at the gate','"Hoo, hoo! Welcome, Milo," says Miss Owl.'],
+    ['p6','p6.jpg','Penny, Hazel, Acorn and Fern running across sunny grass to wave hello to Milo','Penny, Hazel, Acorn, and Fern run to say hi!'],
+    ['p7','p7.jpg','Miss Owl pointing a wing at a long wobbly log across a mossy stream while Milo looks on','Miss Owl points to a long, wobbly log.'],
+    ['p8','p8.jpg','Milo balancing on the log with his arms stretched wide while his friends cheer from the bank','Milo steps up. Wobble, wobble! "Let\'s try!"'],
+    ['p9','p9.jpg','Milo sitting in a soft green patch of moss after falling off the log, with Acorn reaching a paw down to him','Plop! Milo lands in soft green moss. Acorn says, "Try again!"'],
+    ['p10','p10.jpg','Milo walking proudly across the log with his arms out while Acorn and Penny cheer on the far bank','Step, step, step! Milo walks all the way across.'],
+    ['p11','p11.jpg','Milo kneeling at a shallow stream, stacking round grey stones into a wobbly tower while Penny splashes her feet','Splish, splash! Milo stacks stones. Tumble! Let\'s try!'],
+    ['p12','p12.jpg','Fern holding up a flat stone while Milo places it at the base of a tall, steady stone tower','Fern finds a flat stone. Stack, stack, stack!'],
+    ['p13','p13.jpg','Friends sitting on a picnic blanket under a big oak tree, with Acorn sharing a nut with Hazel','Munch, munch! Lunch on a blanket under the big oak.'],
+    ['p14','p14.jpg','Milo drawing a crayon picture of Mama and Papa Bear at a little wooden table while Miss Owl watches from the doorway','Scribble, scribble! Milo draws Mama and Papa.'],
+    ['p15','p15.jpg','Milo running into Mama Bear\'s arms at the gate in golden sunset light while Papa Bear opens his arms and Miss Owl waves goodbye','Miss Owl says, "See you tomorrow!" Hug, hug, Mama and Papa!'],
+    ['end','end.jpg','Milo tucked up in a cosy bed under soft moonlight, his beanie hanging on a hook and a crayon drawing on the nightstand','Snug in bed, Milo whispers, "I tried!" Goodnight, forest school.']
+  ];
+  const PAGES = T.map(([id, src, alt, text]) => ({ id, src, alt, text, audio: `${id}.mp3` }));
+  const $ = (s) => document.querySelector(s);
+  const stage = $('#stage'), prevBtn = $('#prev'), nextBtn = $('#next');
+  const musicBtn = $('#music'), voiceBtn = $('#voice'), counter = $('#counter');
+  const params = new URLSearchParams(location.search);
+  let current = Math.min(PAGES.length - 1, Math.max(0, parseInt(params.get('page') || '0', 10) || 0));
+  let voiceOn = false;
+
+  stage.innerHTML = PAGES.map((p, i) => {
+    const kind = p.id === 'cover' ? ' cover' : p.id === 'end' ? ' end' : '';
+    const label = p.id === 'cover' ? 'Cover' : p.id === 'end' ? 'The End' : `Page ${i} of 15`;
+    const words = p.id === 'cover'
+      ? `<h1 class="title">${p.text}</h1><p class="byline">A Milo the Little Bear story</p>`
+      : p.id === 'end' ? `<h2 class="title">The End</h2><p class="text">${p.text}</p><a class="back" href="../ep2/">Back to Book 2</a>`
+      : `<p class="text">${p.text}</p>`;
+    return `<section class="page${kind}${i === current ? ' active' : ''}" aria-label="${label}">
+      <div class="art"><img src="${p.src}" alt="${p.alt}" loading="${i < 3 ? 'eager' : 'lazy'}">
+        <div class="placeholder" aria-hidden="true"><span class="bear">🐻</span><p>Picture coming soon</p></div></div>
+      <div class="words">${words}</div></section>`;
+  }).join('');
+  const pageEls = Array.from(stage.querySelectorAll('.page'));
+  stage.querySelectorAll('.art img').forEach((img) => {
+    const miss = () => img.closest('.art').classList.add('missing');
+    img.addEventListener('error', miss);
+    if (img.complete && img.naturalWidth === 0) miss();
+  });
+
+  /* ---------- audio ---------- */
+  const MUSIC_FULL = 0.5;    // music level on quiet pages
+  const MUSIC_DUCK = 0.25;   // music level while narration plays
+  const FADE_MS = 1500;      // crossfade length between music sections
+
+  const flip = new Audio('flip.mp3');
+  flip.volume = 0.6; flip.preload = 'auto';
+  const narrator = new Audio();
+  narrator.preload = 'auto';
+
+  let musicOn = false;
+  let narrating = false;     // true while a narration mp3 is audible
+  let pendingAudio = false;  // a play() was blocked by the browser; retry on the next tap/key
+  let music = null;          // element currently carrying the music
+  let musicName = '';        // track file that `music` is playing
+  let fadeOut = null;        // element being faded out during a crossfade
+  let fadeTimer = null;
+
+  function playSafe(a) {
+    const p = a.play();
+    if (p && p.catch) p.catch((err) => { if (err && err.name === 'NotAllowedError') pendingAudio = true; });
+  }
+  function playFlip() {
+    try { flip.currentTime = 0; flip.play().catch(() => {}); } catch (e) {}
+  }
+
+  function musicLevel() { return narrating ? MUSIC_DUCK : MUSIC_FULL; }
+  function refreshMusicVolume() { if (music && !fadeTimer) music.volume = musicLevel(); }
+
+  function crossfadeTo(name) {
+    clearInterval(fadeTimer); fadeTimer = null;
+    if (fadeOut) fadeOut.pause();
+    const out = music, outStart = out ? out.volume : 0;
+    fadeOut = out;
+    music = new Audio(name);
+    musicName = name;
+    music.loop = true; music.preload = 'auto'; music.volume = 0;
+    const incoming = music;
+    playSafe(incoming);
+    const start = Date.now();
+    fadeTimer = setInterval(() => {
+      const t = Math.min(1, (Date.now() - start) / FADE_MS);
+      incoming.volume = t * musicLevel();
+      if (out) out.volume = (1 - t) * outStart;
+      if (t >= 1) {
+        clearInterval(fadeTimer); fadeTimer = null;
+        if (out) out.pause();
+        if (fadeOut === out) fadeOut = null;
+      }
+    }, 50);
+  }
+  function startMusic() {
+    const name = trackFor(PAGES[current].id);
+    if (music && musicName === name) { refreshMusicVolume(); playSafe(music); }
+    else crossfadeTo(name);
+  }
+  function stopMusic() {
+    clearInterval(fadeTimer); fadeTimer = null;
+    if (fadeOut) { fadeOut.pause(); fadeOut = null; }
+    if (music) music.pause();
+  }
+
+  // Fallback only: browser speech if an mp3 can't play
+  const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+  function fallbackSpeak(text) {
+    if (!synth) return;
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.9; synth.speak(u);
+  }
+  function stopSpeaking() {
+    narrator.pause();
+    if (synth) synth.cancel();
+  }
+  function speakPage() {
+    stopSpeaking();
+    const p = PAGES[current];
+    narrator.src = p.audio;
+    narrator.currentTime = 0;
+    const r = narrator.play();
+    if (r && r.catch) r.catch((err) => {
+      if (err && err.name === 'NotAllowedError') pendingAudio = true;
+      // AbortError is our own pause()/src change; only a real failure falls back to speech
+      else if (err && err.name !== 'AbortError' && voiceOn) fallbackSpeak(p.text);
+    });
+  }
+  // Duck music while narrating; narration plays once and stops
+  narrator.addEventListener('playing', () => { narrating = true; refreshMusicVolume(); });
+  ['pause', 'ended'].forEach((ev) => narrator.addEventListener(ev, () => { narrating = false; refreshMusicVolume(); }));
+
+  // Browsers block audio until the first tap/key: retry anything that was blocked
+  function resumeAfterGesture() {
+    if (!pendingAudio) return;
+    pendingAudio = false;
+    if (musicOn) startMusic();
+    if (voiceOn) speakPage();
+  }
+  ['pointerdown', 'keydown'].forEach((ev) => document.addEventListener(ev, resumeAfterGesture, { passive: true }));
+
+  function paintControls() {
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === PAGES.length - 1;
+    const p = PAGES[current];
+    counter.textContent = p.id === 'cover' ? 'Cover' : p.id === 'end' ? 'The End' : `${current} / 15`;
+    musicBtn.setAttribute('aria-pressed', String(musicOn));
+    musicBtn.querySelector('.state').textContent = musicOn ? 'On' : 'Off';
+    voiceBtn.setAttribute('aria-pressed', String(voiceOn));
+    voiceBtn.querySelector('.state').textContent = voiceOn ? 'On' : 'Off';
+  }
+
+  function goTo(index, dir) {
+    if (index < 0 || index >= PAGES.length || index === current) return;
+    const from = pageEls[current], to = pageEls[index];
+    from.classList.remove('active', 'enter-next', 'enter-prev');
+    to.classList.add('active', dir > 0 ? 'enter-next' : 'enter-prev');
+    to.addEventListener('animationend', () => to.classList.remove('enter-next', 'enter-prev'), { once: true });
+    current = index;
+    paintControls();
+    playFlip();
+    // New page: stop the old narration, then read the new page's mp3 once
+    stopSpeaking();
+    if (voiceOn) setTimeout(() => { if (voiceOn && current === index) speakPage(); }, 250);
+    // Section change: crossfade the background music
+    const track = trackFor(PAGES[index].id);
+    if (musicOn && track !== musicName) crossfadeTo(track);
+    // preload next narration
+    if (PAGES[current + 1]) { const a = new Audio(); a.preload = 'auto'; a.src = PAGES[current + 1].audio; }
+  }
+
+  musicBtn.addEventListener('click', () => {
+    musicOn = !musicOn;
+    if (musicOn) startMusic(); else stopMusic();
+    paintControls();
+  });
+  voiceBtn.addEventListener('click', () => {
+    voiceOn = !voiceOn;
+    if (voiceOn) speakPage(); else stopSpeaking();
+    paintControls();
+  });
+  prevBtn.addEventListener('click', () => goTo(current - 1, -1));
+  nextBtn.addEventListener('click', () => goTo(current + 1, 1));
+  document.addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1, -1); }
+    else if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(current + 1, 1); }
+  });
+
+  let sx = 0, sy = 0, st = 0, swiping = false;
+  stage.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse') return;
+    swiping = true; sx = e.clientX; sy = e.clientY; st = Date.now();
+  }, { passive: true });
+  stage.addEventListener('pointerup', (e) => {
+    if (!swiping) return;
+    swiping = false;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Date.now() - st < 800 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) goTo(current + 1, 1); else goTo(current - 1, -1);
+    }
+  }, { passive: true });
+  stage.addEventListener('pointercancel', () => { swiping = false; });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { stopSpeaking(); stopMusic(); }
+    else if (musicOn) startMusic();
+  });
+  paintControls();
+})();
+</script>
+</body>
+</html>
