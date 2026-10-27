@@ -216,6 +216,34 @@
   .page.end .art img { filter: saturate(.9) brightness(1.03); }
   .stage { touch-action: pan-y; }
   @media (max-width: 819px) { .arrow { width:76px; height:76px; } .counter { bottom:36px; } }
+
+  /* v3 layout: big picture on top, short text on a calm band below */
+  body { padding: 10px; gap: 10px; }
+  .toggle { min-height: 52px; font-size: 1.1rem; padding: 8px 18px; flex-basis: 200px; }
+  .book { max-width: min(1100px, calc((100dvh - 282px) * 4 / 3 + 44px)); border-radius: 28px; }
+  .stage { padding: 14px 14px 96px; }
+  .page.active, .page { gap: 0; }
+  @media (min-width: 820px) { .stage { padding: 18px 18px 100px; } .page.active { display: flex; flex-direction: column; } }
+  .art { border-radius: 20px 20px 0 0; }
+  .words { width: 100%; background: #FFF4DE; border-radius: 0 0 20px 20px; padding: 14px 18px 16px; min-height: 5.2em; }
+  .text { font-size: clamp(20px, 1.85vw, 28px); font-weight: 700; line-height: 1.55; white-space: pre-line; max-width: 34em; }
+  .page.cover .words .title { font-size: clamp(24px, 2.6vw, 36px); line-height: 1.1; }
+  .page.cover .words, .page.end .words { gap: 2px; padding-top: 8px; padding-bottom: 8px; }
+  .byline { font-size: clamp(15px, 1.5vw, 18px); }
+  .page.end .text { line-height: 1.4; }
+  .page.end .words { gap: 2px; padding-top: 8px; }
+  .page.end .words .title { font-size: clamp(20px, 2vw, 26px); line-height: 1.1; text-shadow: 2px 2px 0 var(--mustard); }
+  .page.end .back { margin-top: 2px; padding: 2px 4px; }
+  @media (min-width: 820px) {
+    .stage { padding: 18px 18px 18px; }
+    .words { padding: 12px 112px 14px; min-height: 112px; }
+    .arrow { bottom: 36px; width: 72px; height: 72px; }
+    .arrow.left { left: 40px; } .arrow.right { right: 40px; }
+    .counter { top: 32px; right: 32px; bottom: auto; left: auto; transform: none; }
+  }
+  @media (min-width: 820px) and (max-width: 1150px) { .words { padding-left: 96px; padding-right: 96px; } .text { font-size: 19px; } }
+  @media (max-width: 819px) { .text { font-size: 18px; line-height: 1.45; } .words { padding: 10px 12px 12px; } }
+  @media (max-width: 819px) { .book { max-width: 100%; } .stage { padding: 10px 10px 100px; } }
 </style>
 </head>
 <body>
@@ -258,22 +286,22 @@
 
   const T = [
     ['cover','cover.jpg','Milo waving with Penny, Hazel, Acorn, Fern and Miss Owl at the forest school gate, a swing in the trees','Milo\'s Second Day at Forest School'],
-    ['p1','p1.jpg','Milo bouncing on his bed with both arms up, a backpack by the door','Day two at Forest School! Milo bounces on his bed with both arms up. "I\'m ready!" he says.'],
-    ['p2','p2.jpg','Papa Bear straightening Milo\'s beanie while Mama Bear packs pear slices and bread into a basket','Papa gently straightens Milo\'s beanie. Mama packs pear slices and bread in the basket. "Off we go!" says Mama.'],
-    ['p3','p3.jpg','Milo kicking a pile of red and yellow leaves while Mama and Papa walk behind','Milo kicks a big pile of leaves, and they fly up high. "Mama, what do you think we will play today?" he asks. Papa smiles. "Something you have never tried before."'],
-    ['p4','p4.jpg','Milo giggling with leaves on his beanie, Mama Bear laughing beside him','Leaves land on Milo\'s beanie and pom-pom. He laughs with his eyes shut. "Look, I have a leafy hat!" Mama laughs too.'],
-    ['p5','p5.jpg','Milo in a big hug with Mama and Papa at the gate while Miss Owl waits','At the gate, Milo hugs Mama and Papa tight. "I feel a little shy again," he whispers. Mama says, "Yesterday you were brave. You can be brave today too."'],
-    ['p6','p6.jpg','Miss Owl welcoming the five friends in a clearing with a swing and a log','"Welcome, friends!" says Miss Owl. "Today we have the swing and a big log. Let\'s play together." Milo waves to his friends and thinks, I want the swing first!'],
-    ['p7','p7.jpg','Hazel swinging high while Milo and Penny wait their turn','Hazel swings high with her arms up. Milo stands in line with his paws behind his back. Waiting is hard, but Penny says, "We can wait together, Milo."'],
-    ['p8','p8.jpg','Hazel pushing Milo on the swing while Penny watches','Hazel gives Milo a gentle push on the swing. "Your turn, Milo!" she says. Milo calls, "Penny, you can go next!"'],
-    ['p9','p9.jpg','Milo pushing hard on a big log that will not move, Miss Owl pointing','"Let\'s try!" says Milo. He pushes a big log with all his might, but it will not move. Miss Owl points at the log and says, "Ask your friends for help."'],
-    ['p10','p10.jpg','Milo waving his friends over to the big log','Milo waves to his friends. "This log is too big for one bear. Will you help me?" Acorn calls, "We are coming!" and everyone runs over.'],
-    ['p11','p11.jpg','Five friends pushing the big log together','"Let\'s push on three!" says Milo. One, two, three! Everyone pushes together, shoulder to shoulder, and the log rolls forward.'],
-    ['p12','p12.jpg','The friends smiling around their new log bench on two stumps','Now the log sits on two stumps. "Look, it is a bench!" says Penny. Fern smiles. "One friend could not do it, but five friends could."'],
-    ['p13','p13.jpg','Milo and Hazel counting five pinecones while Miss Owl points','Miss Owl points to five pinecones. "Can you count them?" she asks. Milo touches each one while Hazel counts with him: one, two, three, four, five!'],
-    ['p14','p14.jpg','Acorn and Fern sorting red and yellow leaves on the bench while Milo holds up a red leaf','Acorn puts red leaves in one pile, and Fern puts yellow leaves in another. Milo picks up a red leaf. "Where does this one go?" asks Fern. "With the red ones!" says Milo.'],
-    ['p15','p15.jpg','Milo running to Mama and Papa with a leaf and a pinecone while Miss Owl waves goodbye','Milo runs to Mama and Papa holding a red leaf and a pinecone. "I counted to five today!" he says. Miss Owl waves goodbye as Milo calls, "See you tomorrow!"'],
-    ['end','end.jpg','Milo asleep in bed in his beanie, his overalls on a chair and a leaf drawing on the nightstand','Milo is fast asleep, dreaming of his day. He waited for his turn, worked with his friends, counted five pinecones, and sorted red and yellow leaves. Goodnight, little forest friends. Tomorrow, let\'s try again!']
+    ['p1','p1.jpg','Milo bouncing on his bed with both arms up, a backpack by the door','Day two at Forest School!\n"I\'m ready!" says Milo.'],
+    ['p2','p2.jpg','Papa Bear straightening Milo\'s beanie while Mama Bear packs pear slices and bread into a basket','Papa fixes Milo\'s beanie.\n"Off we go!" says Mama.'],
+    ['p3','p3.jpg','Milo kicking a pile of red and yellow leaves while Mama and Papa walk behind','Milo kicks the leaves high.\n"What will we play today?"'],
+    ['p4','p4.jpg','Milo giggling with leaves on his beanie, Mama Bear laughing beside him','"Look, I have a leafy hat!"\nMilo and Mama laugh.'],
+    ['p5','p5.jpg','Milo in a big hug with Mama and Papa at the gate while Miss Owl waits','"I feel shy again," says Milo.\n"You can be brave," says Mama.'],
+    ['p6','p6.jpg','Miss Owl welcoming the five friends in a clearing with a swing and a log','"Let\'s play together!" says Miss Owl.\nMilo thinks, I want the swing first!'],
+    ['p7','p7.jpg','Hazel swinging high while Milo and Penny wait their turn','Hazel swings high. Milo has to wait.\n"We can wait together," says Penny.'],
+    ['p8','p8.jpg','Hazel pushing Milo on the swing while Penny watches','"Your turn, Milo!" says Hazel.\n"Penny, you go next!" says Milo.'],
+    ['p9','p9.jpg','Milo pushing hard on a big log that will not move, Miss Owl pointing','"Let\'s try!" But the log won\'t move.\n"Ask your friends," says Miss Owl.'],
+    ['p10','p10.jpg','Milo waving his friends over to the big log','"This log is too big for me.\nWill you help?" asks Milo.'],
+    ['p11','p11.jpg','Five friends pushing the big log together','"Push on three!" says Milo.\nOne, two, three! The log rolls.'],
+    ['p12','p12.jpg','The friends smiling around their new log bench on two stumps','"One friend could not do it," says Fern.\n"But five friends could!"'],
+    ['p13','p13.jpg','Milo and Hazel counting five pinecones while Miss Owl points','"Can you count them?" asks Miss Owl.\nOne, two, three, four, five!'],
+    ['p14','p14.jpg','Acorn and Fern sorting red and yellow leaves on the bench while Milo holds up a red leaf','"Where does the red leaf go?" asks Fern.\n"With the red ones!" says Milo.'],
+    ['p15','p15.jpg','Milo running to Mama and Papa with a leaf and a pinecone while Miss Owl waves goodbye','"I counted to five today!"\nMilo runs to Mama and Papa.'],
+    ['end','end.jpg','Milo asleep in bed in his beanie, his overalls on a chair and a leaf drawing on the nightstand','Milo took turns, helped his friends,\ncounted, and sorted colours. Goodnight!']
   ];
   const PAGES = T.map(([id, src, alt, text]) => ({ id, src, alt, text, audio: `${id}.mp3` }));
   const $ = (s) => document.querySelector(s);
