@@ -316,7 +316,7 @@
     const label = p.id === 'cover' ? 'Cover' : p.id === 'end' ? 'The End' : `Page ${i} of 15`;
     const words = p.id === 'cover'
       ? `<h1 class="title">${p.text}</h1><p class="byline">A Milo the Little Bear story</p>`
-      : p.id === 'end' ? `<h2 class="title">The End</h2><p class="text">${p.text}</p><a class="back" href="../ep3/">Back to Book 3</a>`
+      : p.id === 'end' ? `<h2 class="title">The End</h2><p class="text">${p.text}</p><a class="back" href="../ep3/">Back to Book 3</a> &nbsp; <a class="back" href="../ep5/">Next book →</a>`
       : `<p class="text">${p.text}</p>`;
     return `<section class="page${kind}${i === current ? ' active' : ''}" aria-label="${label}">
       <div class="art"><img src="${p.src}" alt="${p.alt}" loading="${i < 3 ? 'eager' : 'lazy'}">
